@@ -1,0 +1,6 @@
+keyvault_rg      = "RG_PREMI0012345_WEU"
+keyvault_name    = "S2-PREMI0012345-KV"
+clientidkvsecret = "aks-spn-id"
+rg_name          = "RG_PREMI0012345_WEU"
+rg_location      = "westeurope"
+acrname          = "s2acrdemo123"

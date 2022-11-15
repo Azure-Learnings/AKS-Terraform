@@ -1,0 +1,19 @@
+apiVersion : apps/v1
+kind: Deployment
+metadata:
+  name: eziowebapp 
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: eziowebapp
+  template:
+    metadata:
+      labels:
+        app: eziowebapp 
+    spec:
+      containers:
+        - name: eziowebapp 
+          image: s2acrdemo123.azurecr.io/eziowebapp
+          ports:
+          - containerPort: 80

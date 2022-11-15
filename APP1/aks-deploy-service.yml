@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ezio-nginx-deployment
+  labels:
+    app: ezio-nginx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ezio-nginx
+  template:
+    metadata:
+      labels:
+        app: ezio-nginx
+    spec:
+      containers:
+        - name: ezio-nginx
+          image: s2acrdemo123.azurecr.io/eziowebapp
+          ports:
+            - containerPort: 80
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: ezio-loadbalancer-service
+  labels:
+    app: ezio-nginx
+spec:
+  type: LoadBalancer
+  selector:
+    app: ezio-nginx
+  ports:
+    - port: 80
+      targetPort: 80

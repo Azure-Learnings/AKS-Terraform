@@ -1,0 +1,36 @@
+#### Parameters
+# az ad sp list --display-name s2-aks-spn
+
+keyvaultname="S2-PREMI0012345-KV"
+location="westeurope"
+keyvaultrg="RG_PREMI0012345_WEU"
+sshkeyname="s2sshpubkey"
+spnclientid="97cfcee3-669f-4bba-8a48-6426f3b72b4d"
+clientidkvsecretname="aks-spn-id"
+spnclientsecret="08-8Q~FUYjKFuwXcXqUYkfeXXIe52FV667aU_dov"
+spnkvsecretname="aks-spn-secret"
+spobjectID="5e99f174-75e6-4815-9a9a-c528b18fd63d"
+userobjectID="1ec528a3-e76a-48f5-b37b-c1d6e2c5c744"
+
+
+## Create Key Vault with AZ CLI
+az group create --resource-group $keyvaultrg --location $location
+az keyvault create --name $keyvaultname --resource-group $keyvaultrg --location $location
+az keyvault set-policy --name $keyvaultname --object-id $spobjectID --secret-permissions get set list delete
+
+#### create an ssh key for setting up password-less login between agent nodes.
+ssh-keygen -q -f ~/.ssh/id_rsa_terraform -P "" <<<y >/dev/null 2>&1
+
+#### Add SSH Key in Azure Key vault secret
+# pubkey=`cat ~/.ssh/id_rsa_terraform.pub`
+
+az keyvault secret set --name $sshkeyname --vault-name $keyvaultname --file "~/.ssh/id_rsa_terraform.pub" -o none
+
+#### Store service principal Client id in Azure KeyVault
+az keyvault secret set --name $clientidkvsecretname --vault-name $keyvaultname --value $spnclientid -o none
+
+#### Store service principal Secret in Azure KeyVault
+az keyvault secret set --name $spnkvsecretname --vault-name $keyvaultname --value $spnclientsecret -o none
+
+#### Provide Keyvault secret access to SPN using Keyvault access policy
+az keyvault set-policy --name $keyvaultname --object-id $spobjectID --secret-permissions get set delete list

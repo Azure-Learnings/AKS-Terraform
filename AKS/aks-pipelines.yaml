@@ -1,0 +1,64 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger: none
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+- task: TerraformCLI@0
+  displayName: Terraform Init
+  inputs:
+    command: 'init'
+    workingDirectory: '$(System.DefaultWorkingDirectory)/AKS'
+    allowTelemetryCollection: true
+
+- task: TerraformCLI@0
+  displayName: Terraform Import RG
+  enabled: false
+  inputs:
+    command: 'import'
+    workingDirectory: '$(System.DefaultWorkingDirectory)/AKS'
+    environmentServiceName: 's2-aks-spn'
+    allowTelemetryCollection: true
+    resourceAddress: 'azurerm_resource_group.aks_rg'
+    resourceId: '/subscriptions/aba5e784-1c6c-445f-95bd-16bd462e5603/resourceGroups/RG_PREMI0012345_WEU'
+
+- task: TerraformCLI@0
+  displayName: Terraform Import VNET
+  enabled: false
+  inputs:
+    command: 'import'
+    workingDirectory: '$(System.DefaultWorkingDirectory)/AKS'
+    environmentServiceName: 's2-aks-spn'
+    allowTelemetryCollection: true
+    resourceAddress: 'azurerm_virtual_network.aks_vnet'
+    resourceId: '/subscriptions/aba5e784-1c6c-445f-95bd-16bd462e5603/resourceGroups/RG_PREMI0012345_WEU/providers/Microsoft.Network/virtualNetworks/VNET-PREMI0012345-WEU'
+
+- task: TerraformCLI@0
+  displayName: Terraform Import Subnet
+  enabled: false
+  inputs:
+    command: 'import'
+    workingDirectory: '$(System.DefaultWorkingDirectory)/AKS'
+    environmentServiceName: 's2-aks-spn'
+    allowTelemetryCollection: true
+    resourceAddress: 'azurerm_subnet.aks_subnet'
+    resourceId: '/subscriptions/aba5e784-1c6c-445f-95bd-16bd462e5603/resourceGroups/RG_PREMI0012345_WEU/providers/Microsoft.Network/virtualNetworks/VNET-PREMI0012345-WEU/subnets/VNET-PREMI0012345-Subnet-AKS'
+
+- task: TerraformCLI@0
+  displayName: Terraform Plan
+  inputs:
+    command: 'plan'
+    workingDirectory: '$(System.DefaultWorkingDirectory)/AKS'
+    environmentServiceName: 's2-aks-spn'
+
+- task: TerraformCLI@0
+  displayName: Terraform Apply
+  inputs:
+    command: 'apply'
+    workingDirectory: '$(System.DefaultWorkingDirectory)/AKS'
+    environmentServiceName: 's2-aks-spn'
